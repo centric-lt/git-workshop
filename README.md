@@ -227,7 +227,7 @@ git stash pop stash@{0}
 
 While workstreams can be done in dedicated branches, at some point those changes needs to be merged back to the origin branch as release is usually (not always!) done from the origin branch. Also, sometimes several workstreams needs to be merged too. For change merging ``git merge`` is used. And where are code merge, there is merge conflict.
 
-Checkout branch1 and try to merge changes from main and branch2.
+Checkout _branch1_ and try to merge changes from _main_ and _branch2_.
 
 ```bash
 git config -l | grep -E "merge.?tool"
@@ -272,7 +272,8 @@ Specific visual, how merge conflict resolution does look like depends on the edi
 
 ## Reverting changes
 
-There are times, when changes needs to be reverted. For such actions ``git reset`` and ``git revert`` commands are usually used. For more finegrained reverts a specific file checkout can be used.
+There are times, when changes needs to be reverted. For such actions ``git reset`` and ``git revert`` commands are usually used. For more finegrained reverts a specific file checkout can be used. Also reverting changes depends on whether changes were already committed to branch or not.
+
 
 ```
 git checkout main
@@ -292,4 +293,79 @@ If there are uncommited changes to the files, which does exist in destination br
         M       README.md
         Switched to branch 'main'
         Your branch is up to date with 'origin/main'.
+
+To clear branch state while changes are not yet committed ``git reset``can be used. Depending on the parameters used, _reset_ will either removes changes from commit or removes changes from the files themselves.
+
+```
+echo "CHANGE" >> branch2-file1.txt
+echo "CHANGE" >> branch2-file2.txt
+echo "CHANGE" >> README.md
+git add branch2-file1.txt
+git status
+git reset
+git status
+git reset --hard
+```
+
+
+        :~/git/git-workshop$ git add branch2-file1.txt
+        :~/git/git-workshop$ git status
+        On branch main
+        Your branch is up to date with 'origin/main'.
+
+        Changes to be committed:
+        (use "git restore --staged <file>..." to unstage)
+                new file:   branch2-file1.txt
+
+        Changes not staged for commit:
+        (use "git add <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+                modified:   README.md
+
+        Untracked files:
+        (use "git add <file>..." to include in what will be committed)
+                branch2-file2.txt
+                master-file1.txt.orig
+
+        :~/git/git-workshop$ git reset
+        Unstaged changes after reset:
+        M       README.md
+        :~/git/git-workshop$ git status
+        On branch main
+        Your branch is up to date with 'origin/main'.
+
+        Changes not staged for commit:
+        (use "git add <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+                modified:   README.md
+
+        Untracked files:
+        (use "git add <file>..." to include in what will be committed)
+                branch2-file1.txt
+                branch2-file2.txt
+                master-file1.txt.orig
+
+        no changes added to commit (use "git add" and/or "git commit -a")
+
+        :~/git/git-workshop$ git reset --hard
+        HEAD is now at 11e0209 README updated with workshop commands
+        :~/git/git-workshop$ git status
+        On branch main
+        Your branch is up to date with 'origin/main'.
+
+        Untracked files:
+        (use "git add <file>..." to include in what will be committed)
+                branch2-file1.txt
+                branch2-file2.txt
+                master-file1.txt.orig
+
+        nothing added to commit but untracked files present (use "git add" to track)
+
+However ``git reset`` does not remove files themselves. Git will show untracked files and leave them while switching branches as is unless the file with the same name is tracked in another branch. To remove untracked files a different Git command ``git clean`` is used.
+
+```bash
+git clean -n
+git clean -f
+```
+
 
