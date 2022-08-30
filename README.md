@@ -368,4 +368,22 @@ git clean -n
 git clean -f
 ```
 
+## Working with remotes
+
+After changes are done locally they need to be shared with other team members or at least provided to upstream for the build/release process to be started. To push changes upstream ``git push`` command should be used. Note, that while pulling from the repository can be done anonymously, pushing to the repository requires authentication, even if repository is public. How this is done, depends on the Git backend used.
+
+Before changes can be pushed, updates to the branch have to be pulled and merged from remote via ``git pull`` or fetched via ``git fetch`` and explicitly merged to specific branch. There are situations, when automated merge is not desirable.
+
+
+        :~/git/git-workshop$ git pull
+        Already up to date.
+        :~/git/git-workshop$ git push
+        Enumerating objects: 7, done.
+        Counting objects: 100% (7/7), done.
+        Delta compression using up to 8 threads
+        Compressing objects: 100% (4/4), done.
+        Writing objects: 100% (5/5), 42.67 KiB | 970.00 KiB/s, done.
+        Total 5 (delta 0), reused 0 (delta 0)
+        To github.com:centric-lt/git-workshop.git
+        c69444c..11e0209  main -> main
 
