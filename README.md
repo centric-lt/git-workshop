@@ -1,1 +1,295 @@
-# git-workshop
+# git-workshop# Git workshop
+
+## Initializing/cloning Git repository
+
+To start working with Git a repository needs to be created or cloned. In a work directory run the following command. It is assumed that _~/git_ is a working directory for the Git workshop.
+
+```bash
+cd ~/git/
+git init test-repo
+ls -al test-repo/
+ls -al test-repo/.git/
+cd test-repo/
+git status
+```
+
+You should see the following output
+
+        Initialized empty Git repository in /mnt/c/devel/git/test-repo/.git/
+
+You can list directory content and see the content of an empty repository:
+
+        :~/git$ ls -al test-repo/
+        total 0
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 .
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 ..
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 .git
+        :~/git$ ls -al test-repo/.git/
+        total 0
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 .
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 ..
+        -rwxrwxrwx 1 elvis elvis  23 Aug 29 14:06 HEAD
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 branches
+        -rwxrwxrwx 1 elvis elvis 112 Aug 29 14:06 config
+        -rwxrwxrwx 1 elvis elvis  73 Aug 29 14:06 description
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 hooks
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 info
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 objects
+        drwxrwxrwx 1 elvis elvis 512 Aug 29 14:06 refs
+        :~/git$ cd test-repo/
+        :~/git/test-repo$ git status
+        On branch master
+
+        No commits yet
+
+        nothing to commit (create/copy files and use "git add" to track)
+
+
+However this repos contains only empty indexes so in order to proceed with workshop tasks wthout creating buch of files and branches yourself, please clone existing example repository.
+
+```bash
+cd ~/git/
+git clone https://github.com/centric-lt/git-workshop.git
+cd git-workshop
+```
+
+You should see similar output:
+
+        $ git clone https://github.com/centric-lt/git-workshop.git
+        Cloning into 'git-workshop'...
+        remote: Enumerating objects: 3, done.
+        remote: Counting objects: 100% (3/3), done.
+        remote: Total 3 (delta 0), reused 0 (delta 0), pack-reused 0
+        Unpacking objects: 100% (3/3), 587 bytes | 6.00 KiB/s, done.
+
+## Adding changes
+
+Working with Git repository is ususally defined via the following action loop:
+
+1. Pull latest content from remote and merge changes to your branch
+2. Update file(s)
+3. Add files to a commit
+4. Commit files to a branch
+5. Push changes to the remote location
+6. Repeat. :)
+
+### Change files and see differencies
+
+Initial _master_ branch should contain the following files:
+
+        master-file1.txt
+        master-file2.txt
+
+Update file content by adding some symbols and save the files. Running ``git status`` should now show something similar.
+
+        $ git status
+        On branch main
+        Your branch is up to date with 'origin/main'.
+
+        Changes not staged for commit:
+        (use "git add <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+                modified:   master-file1.txt
+                modified:   master-file2.txt
+
+        no changes added to commit (use "git add" and/or "git commit -a")
+
+To review changes before commiting them, run ``git diff``. Terminal should show similar output:
+
+```diff
+diff --git a/master-file1.txt b/master-file1.txt
+index f0e8800..fe81363 100644
+--- a/master-file1.txt
++++ b/master-file1.txt
+@@ -1 +1,3 @@
+ Master file1 content
++Change to master-file1
++Change to master-file1
+diff --git a/master-file2.txt b/master-file2.txt
+index fa8988f..8b33cf1 100644
+--- a/master-file2.txt
++++ b/master-file2.txt
+@@ -1 +1,2 @@
+ Master file2 content
++Change to master-file2
+```
+
+### Add changes to commit
+
+To add changes to a Git repository, sdd the files to the commit and commit with the commit message. If message option is omitted, then an interactive text exitor session is started. After commit message is saved and editor closed a temporary file content is added to a commit. An interactive session might be required to create more detailed muiltiline commit message.
+
+```bash
+git add master-file*
+git commit -m "Updating master files"
+```
+
+### Viewing the change log
+
+Git stores all the changes in it's database and these changes can be reviewed at any time. A ``git log`` and ``git show`` commands with appropriate parameters is used to review changes.
+
+```bash
+git log
+git log -p
+git show commit_ID
+```
+
+## Working with branches and stash
+
+Git supports working with several workstreams in the same time period. Obviously only one branch can be active at the given moment, but branches can be easily switched. Also Git provides temporary storage for not yet ready to commit changes. It can also be used as a kind of clipboard to move changes between branches.
+
+To store changes in a temporary storage use ``git stash`` command. For example we have file changes, which are not ready for commit but we need to switch branch and do changes in another branch and we do not want to loose changes in current branch.
+
+        :~/git/git-workshop$ git status
+        On branch main
+        Your branch is up to date with 'origin/main'.
+
+        Changes not staged for commit:
+        (use "git add <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+                modified:   master-file1.txt
+                modified:   master-file2.txt
+
+        no changes added to commit (use "git add" and/or "git commit -a")
+
+To save those changes we can stash them:
+
+```bash
+git stash
+git stash list
+```
+
+        :~/git/git-workshop$ git stash
+        Saved working directory and index state WIP on main: c69444c Initial commit of master-files to master branch
+        :~/git/git-workshop$ git stash list
+        stash@{0}: WIP on main: c69444c Initial commit of master-files to master branch
+
+After changes have been stashed a branch can be checked out using ``git checkout``. If new branch is required, then option ``-b`` should be used to create new branch.
+
+```bash
+git checkout -b branch1
+git checkout branch2
+git checkout -b branch2
+git branch --list
+git branch -a
+```
+
+If _branch2_ is not a name of an existing branch, you should see something like this
+
+        $ git checkout -b "branch1"
+        Switched to a new branch 'branch1'
+        :~/git/git-workshop$ git checkout main
+        M       README.md
+        Switched to branch 'main'
+        Your branch is up to date with 'origin/main'.
+        :~/git/git-workshop$ git checkout "branch2"
+        error: pathspec 'branch2' did not match any file(s) known to git
+        :~/git/git-workshop$ git checkout -b "branch2"
+        Switched to a new branch 'branch2'
+        :~/git/git-workshop$ git branch --list
+        * branch1
+        branch2
+        main
+        :~/git/git-workshop$ git branch -a
+        * branch1
+        branch2
+        main
+        remotes/origin/HEAD -> origin/main
+        remotes/origin/branch1
+        remotes/origin/branch2
+        remotes/origin/main
+
+After changes have been done to branch1 and/or branch2, previously stashed changes can be retrieved and applied back to master branch. Stash can contain multiple stacked active work items and are retrieved from the top, unless specific stack item is referenced. If stash item can be applied to current branch without any merge conflicts, item is dropped from stash. If there are issues with stash item merge it will remain in the stash and will have to be removed explicitly.
+
+```
+git checkout main
+git stash list
+git stash pop stash@{0}
+```
+
+
+        :~/git/git-workshop$ git stash list
+        stash@{0}: WIP on main: c69444c Initial commit of master-files to master branch
+        :~/git/git-workshop$ git stash pop stash@{0}
+        On branch main
+        Your branch is up to date with 'origin/main'.
+
+        Changes not staged for commit:
+        (use "git add <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+                modified:   README.md
+                modified:   master-file1.txt
+                modified:   master-file2.txt
+
+        no changes added to commit (use "git add" and/or "git commit -a")
+        Dropped stash@{0} (0bed5a8be7082043246b08a5f7a2e0309e260bb7)
+
+## Merging branches
+
+While workstreams can be done in dedicated branches, at some point those changes needs to be merged back to the origin branch as release is usually (not always!) done from the origin branch. Also, sometimes several workstreams needs to be merged too. For change merging ``git merge`` is used. And where are code merge, there is merge conflict.
+
+Checkout branch1 and try to merge changes from main and branch2.
+
+```bash
+git config -l | grep -E "merge.?tool"
+git status
+git merge main
+git merge branch2
+```
+
+The output should be something like this
+
+        :~/git/git-workshop$ git config -l | grep -E "merge.?tool"
+        merge.tool=meld
+        mergetool.meld.cmd=meld --diff "$BASE" "$LOCAL" "$REMOTE" --output "$MERGED"
+
+        :~/git/git-workshop$ git status
+        On branch branch1
+        Your branch is up to date with 'origin/branch1'.
+
+        Changes not staged for commit:
+        (use "git add <file>..." to update what will be committed)
+        (use "git restore <file>..." to discard changes in working directory)
+                modified:   README.md
+
+        no changes added to commit (use "git add" and/or "git commit -a")
+        :~/git/git-workshop$ git merge main
+        Already up to date.
+        :~/git/git-workshop$ git merge branch2
+        Auto-merging master-file1.txt
+        CONFLICT (content): Merge conflict in master-file1.txt
+        Automatic merge failed; fix conflicts and then commit the result.
+        :~/git/git-workshop$ git mergetool
+        Merging:
+        master-file1.txt
+
+        Normal merge conflict for 'master-file1.txt':
+        {local}: modified file
+        {remote}: modified file
+
+Specific visual, how merge conflict resolution does look like depends on the editor specified in ``merge.tool`` configuration option.
+
+![Git mergetool](images/merge-conflict.jpg)
+
+## Reverting changes
+
+There are times, when changes needs to be reverted. For such actions ``git reset`` and ``git revert`` commands are usually used. For more finegrained reverts a specific file checkout can be used.
+
+```
+git checkout main
+git checkout -- master-file1.txt
+git checkout main.
+```
+
+If there are uncommited changes to the files, which does exist in destination branch, git will refuse to change branches as data loss will occur.
+
+        :~/git/git-workshop$ git checkout main
+        error: Your local changes to the following files would be overwritten by checkout:
+                master-file1.txt
+        Please commit your changes or stash them before you switch branches.
+        Aborting
+        :~/git/git-workshop$ git checkout -- master-file1.txt
+        :~/git/git-workshop$ git checkout main
+        M       README.md
+        Switched to branch 'main'
+        Your branch is up to date with 'origin/main'.
+
