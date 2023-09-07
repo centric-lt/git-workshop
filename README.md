@@ -387,3 +387,9 @@ Before changes can be pushed, updates to the branch have to be pulled and merged
         To github.com:centric-lt/git-workshop.git
         c69444c..11e0209  main -> main
 
+## Finding bug with git bisect
+
+Branch ``bug-branch`` contains a two scripts, which have been broken at some point in time. In real life it woulg be hard to identify specific commit, which have broken ``main-script.sh`` and ``main-script.ps1`` as git log usually does not reflect bad commit and commit history may contain hundreds of the commits since bug was introduced. Using ``git bisect`` it is possible to shorten location of bad commit by using binary search algorithm.
+
+
+
