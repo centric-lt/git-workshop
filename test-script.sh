@@ -7,5 +7,5 @@ REZ=$?
 if [ "$REZ" = "0" ]; then
     git bisect good
 else
-    git git bisect bad
+    git bisect bad
 fi
