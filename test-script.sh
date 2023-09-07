@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REZ=0
-bash ./test-script.sh
+bash ./main-script.sh
 REZ=$?
 
 if [ "$REZ" = 0 ]; then
