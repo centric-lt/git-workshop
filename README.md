@@ -391,5 +391,10 @@ Before changes can be pushed, updates to the branch have to be pulled and merged
 
 Branch ``bug-branch`` contains a two scripts, which have been broken at some point in time. In real life it woulg be hard to identify specific commit, which have broken ``main-script.sh`` and ``main-script.ps1`` as git log usually does not reflect bad commit and commit history may contain hundreds of the commits since bug was introduced. Using ``git bisect`` it is possible to shorten location of bad commit by using binary search algorithm.
 
+To start searching for the bug a good commit needs to be identified. In this test case this is _50c86e0b76a308f3326b09bf1654b6061b7e3a4f_ commit, where our test workload script was added. Bad commit iun our case is latest branch commit. In real life an earliest release, where bug was identified should be used, so search scope can be narrowed.
 
+
+
+### An example of an automated search
+In real life this most likely would be some release tag. Next step is to make a copy of a test script as this script is part of repository and it does not exist in earlier commits
 
