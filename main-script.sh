@@ -6,5 +6,8 @@ uname -a
 hostname -f
 
 echo "Additional command moved down"
+echo "Printing finish line"
+eco "-------------------------------------"
 
-exit 0
+
+
