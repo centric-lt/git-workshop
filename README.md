@@ -55,7 +55,7 @@ cd git-workshop
 
 You should see similar output:
 
-        $ git clone https://github.com/centric-lt/git-workshop.git
+        :~/git/git-workshop$ git clone https://github.com/centric-lt/git-workshop.git
         Cloning into 'git-workshop'...
         remote: Enumerating objects: 3, done.
         remote: Counting objects: 100% (3/3), done.
@@ -82,7 +82,7 @@ Initial _master_ branch should contain the following files:
 
 Update file content by adding some symbols and save the files. Running ``git status`` should now show something similar.
 
-        $ git status
+        :~/git/git-workshop$ git status
         On branch main
         Your branch is up to date with 'origin/main'.
 
@@ -175,7 +175,7 @@ git branch -a
 
 If _branch2_ is not a name of an existing branch, you should see something like this
 
-        $ git checkout -b "branch1"
+        :~/git/git-workshop$ git checkout -b "branch1"
         Switched to a new branch 'branch1'
         :~/git/git-workshop$ git checkout main
         M       README.md
@@ -389,10 +389,57 @@ Before changes can be pushed, updates to the branch have to be pulled and merged
 
 ## Finding bug with git bisect
 
-Branch ``bug-branch`` contains a two scripts, which have been broken at some point in time. In real life it woulg be hard to identify specific commit, which have broken ``main-script.sh`` and ``main-script.ps1`` as git log usually does not reflect bad commit and commit history may contain hundreds of the commits since bug was introduced. Using ``git bisect`` it is possible to shorten location of bad commit by using binary search algorithm.
+Branch ``bug-branch`` contains a two scripts, which have been broken at some point in time. In real life it woulg be hard to identify specific commit, which have broken ``main-script.sh`` and ``main-script.ps1`` as git log usually does not reflect bad commit and commit history may contain hundreds of the commits since bug was introduced. Using ``git bisect`` it is possible to shorten process of location of bad commit by using binary search algorithm.
 
-To start searching for the bug a good commit needs to be identified. In this test case this is _50c86e0b76a308f3326b09bf1654b6061b7e3a4f_ commit, where our test workload script was added. Bad commit iun our case is latest branch commit. In real life an earliest release, where bug was identified should be used, so search scope can be narrowed.
+To start searching for the bug a good commit needs to be identified. In this test case this is _50c86e0b76a308f3326b09bf1654b6061b7e3a4f_ commit, where our test workload script was added. Bad commit iun our case is latest branch commit. In real life an earliest release, where bug was identified should be used, so search scope can be narrowed. To imitate application test main-script.sh script will be run and exit code will be checked. A non 0 exit code will identify bad commit. The whole process would look like this:
 
+1. Start bisect sesion by running ``git bisect start``
+2. Checkout known _bad_ commit and mark it as such by running ``git bisect bad``
+3. Mark known _good_ commit by running ``git bisect good COMMIT_ID`` or ``git commit good TAG``
+4. Git will check out commit in between of those two and will promt how many search steps have left.
+5. Run test to verify if commit at step 4 is good or bad.
+6. According to test results run ``git bisect good`` or ``git bisect bad``
+7. Git will check out another commit in between according to command in step 6.
+8. Repeat from step 5 until Git will report: "Bisecting: 0 revisions left to test after this (roughly 0 steps)"
+
+Screen output should look similar to this.
+
+        :~/git/git-workshop$ git checkout bug-branch
+        Switched to branch 'bug-branch'
+        :~/git/git-workshop$ git bisect start
+        :~/git/git-workshop$ git bisect bad
+        :~/git/git-workshop$ git bisect good 50c86e0b76a308f3326b09bf1654b6061b7e3a4f
+        Bisecting: 8 revisions left to test after this (roughly 3 steps)
+        [9b439c21fb32220a173e2ab50241c0ac5c49da00] POwershell test script added
+        :~/git/git-workshop$ bash main-script.sh && echo "GOOD" || echo "BAD"
+        This is an example of working code
+        Linux NBKL4193482 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+        NBKL4193482.clt.lt.centric.lan
+        Additional command moved down
+        GOOD
+        :~/git/git-workshop$ git bisect good
+        Bisecting: 4 revisions left to test after this (roughly 2 steps)
+        [f9b58f1ffd3988e8a940cdb3e5d253ffd003f766] Breaking Powershell script
+        :~/git/git-workshop$ bash main-script.sh && echo "GOOD" || echo "BAD"
+        This is an example of working code
+        Linux NBKL4193482 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+        NBKL4193482.clt.lt.centric.lan
+        Additional command moved down
+        Printing finish line
+        main-script.sh: line 10: eco: command not found
+        BAD
+        :~/git/git-workshop$ git bisect bad
+        Bisecting: 1 revision left to test after this (roughly 1 step)
+        [1a960e8945227cf16f0ac05776f3abd5a39bef58] Fixing Powershell test script
+        :~/git/git-workshop$ bash main-script.sh && echo "GOOD" || echo "BAD"
+        This is an example of working code
+        Linux NBKL4193482 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+        NBKL4193482.clt.lt.centric.lan
+        Additional command moved down
+        GOOD
+        :~/git/git-workshop$ git bisect good
+        Bisecting: 0 revisions left to test after this (roughly 0 steps)
+        [0e8d316afb3a8a06082659e684c593adbf12b853] Adding finish line to main script BAD
 
 
 ### An example of an automated search
