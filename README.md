@@ -443,6 +443,23 @@ Screen output should look similar to this.
         Bisecting: 0 revisions left to test after this (roughly 0 steps)
         [0e8d316afb3a8a06082659e684c593adbf12b853] Adding finish line to main script BAD
 
+Get commit ID by using ``git status`` and finish bisect session.
+
+:~/git/git-workshop$ git status
+HEAD detached at 0e8d316
+You are currently bisecting, started from branch 'bug-branch'.
+  (use "git bisect reset" to get back to the original branch)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        test.ps1
+        test.sh
+
+nothing added to commit but untracked files present (use "git add" to track)
+:~/git/git-workshop$ git bisect reset
+Previous HEAD position was 0e8d316 Adding finish line to main script BAD
+Switched to branch 'bug-branch'
+
 
 
 ### An example of an automated search
