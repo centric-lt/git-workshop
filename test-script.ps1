@@ -1,23 +1,20 @@
-$BRez=-1
-$Rez=0
+$BRez=$False
+$Rez=$True
 
-while ( $BRez -ne 0 ) {
+while ( $BRez -ne $True ) {
 
-    Powershell.exe -executionpolicy Unrestricted -File  ".\main-script.ps1"
-    $Rez=$LASTEXITCODE
+    $out = & Powershell.exe -executionpolicy Unrestricted -File  ".\main-script.ps1"
+    $Rez = $out | Select-String -Pattern ': ObjectNotFound:' -CaseSensitive -SimpleMatch -Quiet
+    # PowerShell has a weird execution result setting and $? $LASTEXITCODE does not help to catch failure :)
 
-    if ( $Rez -eq 0 ) {
-        Wtite-Host "********* GOOD Branch **********"
+    if ( $Rez -ne $True ) {
+        Write-Host "********* GOOD Branch **********"
         git status | Select-String -Pattern " at " -CaseSensitive -SimpleMatch
-        git bisect good | Select-String -Pattern '0 revisions left to test after this' -CaseSensitive -SimpleMatch -Quiet
-        $BRez=$LASTEXITCODE
-
+        $BRez=git bisect good | Select-String -Pattern '0 revisions left to test after this' -CaseSensitive -SimpleMatch -Quiet
     } else {
-        Wtite-Host "********** BAD Branch **********"
+        Write-Host "********** BAD Branch **********"
         git status | Select-String -Pattern " at " -CaseSensitive -SimpleMatch
-        git bisect bad | Select-String -Pattern '0 revisions left to test after this' -CaseSensitive -SimpleMatch -Quiet
-        $BRez=$LASTEXITCODE
-
+        $BRez=git bisect bad | Select-String -Pattern '0 revisions left to test after this' -CaseSensitive -SimpleMatch -Quiet
     }
 }
 
