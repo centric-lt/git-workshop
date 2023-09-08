@@ -402,6 +402,8 @@ To start searching for the bug a good commit needs to be identified. In this tes
 7. Git will check out another commit in between according to command in step 6.
 8. Repeat from step 5 until Git will report: "Bisecting: 0 revisions left to test after this (roughly 0 steps)"
 
+After completing above steps git will check out last known good commit. Next commit in history should introduce bug.
+
 Screen output should look similar to this.
 
         :~/git/git-workshop$ git checkout bug-branch
@@ -442,6 +444,14 @@ Screen output should look similar to this.
         [0e8d316afb3a8a06082659e684c593adbf12b853] Adding finish line to main script BAD
 
 
-### An example of an automated search
-In real life this most likely would be some release tag. Next step is to make a copy of a test script as this script is part of repository and it does not exist in earlier commits
 
+### An example of an automated search
+
+In real life some kind of automation should be used. An example simple script is prepared to run such demonstration. First, make a copy of a test script as it is  part of repository and file does not exist in earlier commits.
+
+        # Linux
+        cp test-script.sh test.sh
+        # Windows
+        cp test-script.ps1 test.ps1
+
+After automation script is ready, start ``git bisect`` session and run the script. After script is finished, git should have checked out last known good commit.
