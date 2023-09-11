@@ -400,71 +400,66 @@ To start searching for the bug a good commit needs to be identified. In this tes
 5. Run test to verify if commit at step 4 is good or bad.
 6. According to test results run ``git bisect good`` or ``git bisect bad``
 7. Git will check out another commit in between according to command in step 6.
-8. Repeat from step 5 until Git will report: "Bisecting: 0 revisions left to test after this (roughly 0 steps)"
+8. Repeat from step 5 until Git will report: "GIT_COMMIT_HASH  is the first bad commit"
 
 After completing above steps git will check out last known good commit. Next commit in history should introduce bug.
 
 Screen output should look similar to this.
 
-        :~/git/git-workshop$ git checkout bug-branch
-        Switched to branch 'bug-branch'
-        :~/git/git-workshop$ git bisect start
-        :~/git/git-workshop$ git bisect bad
-        :~/git/git-workshop$ git bisect good 50c86e0b76a308f3326b09bf1654b6061b7e3a4f
-        Bisecting: 8 revisions left to test after this (roughly 3 steps)
-        [9b439c21fb32220a173e2ab50241c0ac5c49da00] POwershell test script added
-        :~/git/git-workshop$ bash main-script.sh && echo "GOOD" || echo "BAD"
-        This is an example of working code
-        Linux NBKL4193482 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
-        NBKL4193482.clt.lt.centric.lan
-        Additional command moved down
-        GOOD
-        :~/git/git-workshop$ git bisect good
-        Bisecting: 4 revisions left to test after this (roughly 2 steps)
-        [f9b58f1ffd3988e8a940cdb3e5d253ffd003f766] Breaking Powershell script
-        :~/git/git-workshop$ bash main-script.sh && echo "GOOD" || echo "BAD"
-        This is an example of working code
-        Linux NBKL4193482 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
-        NBKL4193482.clt.lt.centric.lan
-        Additional command moved down
-        Printing finish line
-        main-script.sh: line 10: eco: command not found
-        BAD
-        :~/git/git-workshop$ git bisect bad
-        Bisecting: 1 revision left to test after this (roughly 1 step)
-        [1a960e8945227cf16f0ac05776f3abd5a39bef58] Fixing Powershell test script
-        :~/git/git-workshop$ bash main-script.sh && echo "GOOD" || echo "BAD"
-        This is an example of working code
-        Linux NBKL4193482 5.10.102.1-microsoft-standard-WSL2 #1 SMP Wed Mar 2 00:30:59 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
-        NBKL4193482.clt.lt.centric.lan
-        Additional command moved down
-        GOOD
-        :~/git/git-workshop$ git bisect good
-        Bisecting: 0 revisions left to test after this (roughly 0 steps)
-        [0e8d316afb3a8a06082659e684c593adbf12b853] Adding finish line to main script BAD
+                :~/git/git-workshop$ git bisect start
+                :~/git/git-workshop$ git bisect bad
+                :~/git/git-workshop$ git bisect good 50c86e0b76a308f3326b09bf1654b6061b7e3a4f
+                Bisecting: 10 revisions left to test after this (roughly 4 steps)
+                [0e8d316afb3a8a06082659e684c593adbf12b853] Adding finish line to main script BAD
+                :~/git/git-workshop$ bash main-script.sh > /dev/null 2>&1 && echo "GOOD" || echo "BAD"
+                BAD
+                :~/git/git-workshop$ git bisect bad
+                Bisecting: 5 revisions left to test after this (roughly 3 steps)
+                [b2b8d0928089d1c16a54f3231030cff0e281cb90] Updating master-file2
+                :~/git/git-workshop$ bash main-script.sh > /dev/null 2>&1 && echo "GOOD" || echo "BAD"
+                GOOD
+                :~/git/git-workshop$ git bisect good
+                Bisecting: 2 revisions left to test after this (roughly 2 steps)
+                [9b439c21fb32220a173e2ab50241c0ac5c49da00] POwershell test script added
+                :~/git/git-workshop$ bash main-script.sh > /dev/null 2>&1 && echo "GOOD" || echo "BAD"
+                GOOD
+                :~/git/git-workshop$ git bisect good
+                Bisecting: 0 revisions left to test after this (roughly 1 step)
+                [1a960e8945227cf16f0ac05776f3abd5a39bef58] Fixing Powershell test script
+                :~/git/git-workshop$ bash main-script.sh > /dev/null 2>&1 && echo "GOOD" || echo "BAD"
+                GOOD
+                :~/git/git-workshop$ git bisect good
+                0e8d316afb3a8a06082659e684c593adbf12b853 is the first bad commit
+                commit 0e8d316afb3a8a06082659e684c593adbf12b853
+                Author: Elvinas Piliponis <elvinas.piliponis@centric.eu>
+                Date:   Thu Sep 7 15:08:51 2023 +0300
 
-Get commit ID by using ``git status`` and finish bisect session.
+                Adding finish line to main script BAD
 
-:~/git/git-workshop$ git status
-HEAD detached at 0e8d316
-You are currently bisecting, started from branch 'bug-branch'.
-  (use "git bisect reset" to get back to the original branch)
+                - This is bad commit
 
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-        test.ps1
-        test.sh
+                main-script.sh | 5 ++++-
+                1 file changed, 4 insertions(+), 1 deletion(-)
 
-nothing added to commit but untracked files present (use "git add" to track)
-:~/git/git-workshop$ git bisect reset
-Previous HEAD position was 0e8d316 Adding finish line to main script BAD
-Switched to branch 'bug-branch'
 
+Get commit ID by using ``git bisect view`` and finish bisect session.
+
+                :~/git/git-workshop$ git bisect view
+                commit 0e8d316afb3a8a06082659e684c593adbf12b853 (refs/bisect/bad)
+                Author: Elvinas Piliponis <elvinas.piliponis@centric.eu>
+                Date:   Thu Sep 7 15:08:51 2023 +0300
+
+                Adding finish line to main script BAD
+
+                - This is bad commit
+                :~/git/git-workshop$ git bisect reset
+                Previous HEAD position was 0e8d316 Adding finish line to main script BAD
+                Switched to branch 'bug-branch'
 
 
 ### An example of an automated search
 
-In real life some kind of automation should be used. An example simple script is prepared to run such demonstration. First, make a copy of a test script as it is  part of repository and file does not exist in earlier commits.
+In real life some kind of automation should be used. An example simple scripts are prepared to run such demonstration. First, make a copy of a test script as it is  part of repository and file does not exist in earlier commits.
 
         # Linux
         cp test-script.sh test.sh
@@ -472,3 +467,22 @@ In real life some kind of automation should be used. An example simple script is
         cp test-script.ps1 test.ps1
 
 After automation script is ready, start ``git bisect`` session and run the script. After script is finished, git should have checked out last known good commit.
+
+        :~/git/git-workshop$ git bisect start ; git bisect bad;  git bisect good 50c86e0b76a308f3326b09bf1654b6061b7e3a4f
+        :~/git/git-workshop$ bash test.sh
+        ********** BAD Branch **********
+        HEAD detached at 0e8d316
+        ********* GOOD Branch **********
+        HEAD detached at b2b8d09
+        ********* GOOD Branch **********
+        HEAD detached at 9b439c2
+        ********* GOOD Branch **********
+        HEAD detached at 1a960e8
+        0e8d316afb3a8a06082659e684c593adbf12b853 is the first bad commit
+        commit 0e8d316afb3a8a06082659e684c593adbf12b853 (refs/bisect/bad)
+        Author: Elvinas Piliponis <elvinas.piliponis@centric.eu>
+        Date:   Thu Sep 7 15:08:51 2023 +0300
+
+        Adding finish line to main script BAD
+
+        - This is bad commit
