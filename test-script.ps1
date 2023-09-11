@@ -10,12 +10,12 @@ while ( $BRez -ne $True ) {
     if ( $Rez -ne $True ) {
         Write-Host "********* GOOD Branch **********"
         git status | Select-String -Pattern " at " -CaseSensitive -SimpleMatch
-        $BRez=git bisect good | Select-String -Pattern '0 revisions left to test after this' -CaseSensitive -SimpleMatch -Quiet
+        $BRez=git bisect good | Select-String -Pattern 'is the first bad commit' -CaseSensitive -SimpleMatch -Quiet
     } else {
         Write-Host "********** BAD Branch **********"
         git status | Select-String -Pattern " at " -CaseSensitive -SimpleMatch
-        $BRez=git bisect bad | Select-String -Pattern '0 revisions left to test after this' -CaseSensitive -SimpleMatch -Quiet
+        $BRez=git bisect bad | Select-String -Pattern 'is the first bad commit' -CaseSensitive -SimpleMatch -Quiet
     }
 }
 
-git status
+git bisect view

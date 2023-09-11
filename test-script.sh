@@ -11,15 +11,14 @@ while [ $BREZ -ne 0 ]; do
     if [ "$REZ" = "0" ]; then
         echo "********* GOOD Branch **********"
         git status | grep " at "
-        git bisect good | grep -q '0 revisions left to test after this'
+        git bisect good | grep 'is the first bad commit'
         BREZ=$?
     else
         echo "********** BAD Branch **********"
         git status | grep " at "
-        git bisect bad | grep -q '0 revisions left to test after this'
+        git bisect bad | grep 'is the first bad commit'
         BREZ=$?
     fi
 
 done
-
-git status
+git bisect view
